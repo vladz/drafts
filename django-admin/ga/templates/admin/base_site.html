@@ -1,0 +1,19 @@
+{% extends "admin/base.html" %}
+
+{% load i18n %}
+{% load i18n_switcher %}
+
+{% block userlinks %}
+<a href="{{ request|switch_i18n:'ru' }}">RU</a>
+    <span class="separator">|</span>
+<a href="{{ request|switch_i18n:'en' }}">EN</a>
+    <span class="separator">|</span>
+  {% url 'django-admindocs-docroot' as docsroot %}
+  {% if docsroot %}
+    <a href="{{ docsroot }}">{% trans 'Documentation' %}</a>
+    <span class="separator">|</span>
+  {% endif %}
+  <a href="{% url 'admin:password_change' %}">{% trans 'Change password' %}</a>
+  <span class="separator">|</span>
+  <a href="{% url 'admin:logout' %}">{% trans 'Log out' %}</a>
+{% endblock %}

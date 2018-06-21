@@ -1,0 +1,116 @@
+version: '3'
+volumes:
+    db-socket:
+    uwsgi-socket:
+
+services:
+  smtp:
+    image: namshi/smtp
+    ports:
+      - "25:25"
+    environment:
+      - MAILNAME=localhost
+
+  redis-broker:
+    image: redis
+    restart: always
+
+  postgres:
+    image: postgres:10
+    environment:
+        - POSTGRES_USER=123
+        - POSTGRES_DB=123
+        - POSTGRES_PASSWORD=123
+    volumes:
+      - db-socket:/run/postgresql
+
+  django:
+    build:
+      context: ./django
+      dockerfile: ${PWD}/django/Dockerfile
+    volumes:
+      - db-socket:/run/postgresql
+      - uwsgi-socket:/run/uwsgi
+      - ./django/123:/123
+    depends_on:
+      - postgres
+      - redis-broker
+      - smtp
+    environment:
+      - DB_NAME=123
+      - DB_HOST=postgres
+    restart: always
+
+  django-migrate:
+    command: python /123/manage.py migrate
+    build:
+      context: ./django
+      dockerfile: ${PWD}/django/Dockerfile
+    volumes:
+      - db-socket:/run/postgresql
+      - ./django/123:/123
+    depends_on:
+      - django
+    environment:
+      - DB_NAME=123
+      - DB_HOST=postgres
+    restart: "no"
+
+  celery-beat:
+    command: python /123/manage.py celery -A 123 beat -l info
+    build:
+      context: ./django
+      dockerfile: ${PWD}/django/Dockerfile
+    volumes:
+      - db-socket:/run/postgresql
+      - ./django/123:/123
+    depends_on:
+      - django-migrate
+    environment:
+      - DB_NAME=123
+      - DB_HOST=postgres
+    restart: always
+
+  celery-worker:
+    command: python /123/manage.py celery -A 123 worker -l info
+    build:
+      context: ./django
+      dockerfile: ${PWD}/django/Dockerfile
+    volumes:
+      - db-socket:/run/postgresql
+      - ./django/123:/123
+    depends_on:
+      - celery-beat
+    environment:
+      ...
+      - DB_NAME=123
+      - DB_HOST=postgres
+    restart: always
+
+  backend_api:
+    build:
+      context: ./backend-api
+      dockerfile: ${PWD}/backend-api/Dockerfile
+    volumes:
+      - db-socket:/run/postgresql
+      - ./backend-api/backend_api:/backend_api
+    depends_on:
+      - django-migrate
+    environment:
+      ...
+      - DB_NAME=123
+      - DB_HOST=postgres
+    extra_hosts:
+      - "123:123.123.123.123"
+    restart: always
+
+  nginx:
+     image: nginx:1.13.12
+     volumes:
+       - ./nginx/sites-enabled:/etc/nginx/conf.d/
+       - uwsgi-socket:/run/uwsgi
+       - ./django/123/static:/123/static
+     ports:
+       - 81:80
+     depends_on:
+        - backend_api

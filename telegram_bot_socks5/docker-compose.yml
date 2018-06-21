@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  telegram_bot:
+    build:
+      context: .
+    ports:
+      - 5000:5000
+    env_file:
+      - dev.env
+    restart: always

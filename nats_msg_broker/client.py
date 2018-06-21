@@ -33,10 +33,12 @@ class MsgBrokerClient:
         self.subscriber_queue = asyncio.Queue()
 
     async def run_client(self) -> None:
-        await self.client.connect(servers=[f'nats://{self.server_addr}'], max_reconnect_attempts=-1)
+        await self.client.connect(servers=[f'nats://{self.server_addr}'],
+                                  max_reconnect_attempts=-1)
 
     async def subscribe(self) -> int:
-        return await self.client.subscribe_async(self.service_name, cb=self._handler)
+        return await self.client.subscribe_async(self.service_name,
+                                                 cb=self._handler)
 
     async def publish(self, receiver, msg: Dict[str, Any], reply=None) -> None:
         try:

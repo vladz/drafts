@@ -1,0 +1,2 @@
+CONFIRMATION_TYPE_MESSAGE = "confirmation"
+NOTIFICATION_TYPE_MESSAGE = "notification"

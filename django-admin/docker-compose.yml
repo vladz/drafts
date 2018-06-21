@@ -1,0 +1,41 @@
+version: '3'
+volumes:
+    db-socket:
+    uwsgi-socket:
+
+services:
+  django:
+    build:
+      context: .
+      dockerfile: ${PWD}/Dockerfile
+    volumes:
+      - db-socket:/run/postgresql
+      - uwsgi-socket:/run/uwsgi
+      - ./django/ga:/ga
+    environment:
+      - ...
+    restart: always
+
+  celery-beat:
+    command: python /ga/manage.py celery -A ga beat -l info
+    build:
+      context: .
+      dockerfile: ${PWD}/Dockerfile
+    volumes:
+      - db-socket:/run/postgresql
+      - ./ga:/ga
+    environment:
+      - ...
+    restart: always
+
+  celery-worker:
+    command: python /ga/manage.py celery -A ga worker -l info
+    build:
+      context: ./
+      dockerfile: ${PWD}/Dockerfile
+    volumes:
+      - db-socket:/run/postgresql
+      - ./ga:/ga
+    environment:
+      - ...
+    restart: always

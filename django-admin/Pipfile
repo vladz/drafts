@@ -1,0 +1,21 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+django = "==1.11"
+django-suit = "==0.2.25"
+django-celery = "==3.2.2"
+"psycopg2" = "==2.7.4"
+redis = "==2.10.6"
+uwsgi = "==2.0"
+requests = "==2.18.4"
+dataclasses = "==0.5"
+dataclasses-json = "==0.0.5"
+
+[dev-packages]
+"requests[socks]" = "*"
+
+[requires]
+python_version = "3.6.5"
