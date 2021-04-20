@@ -10,7 +10,7 @@ python_version = '3.6'
 aioredis = "==1.1.0"
 aiosocksy = "==0.1.1"
 aiotg = "==0.9.9"
-asyncpg = "==0.16.0"
+asyncpg = "==0.21.0"
 dataclasses = "==0.6"
 
 [dev-packages]
